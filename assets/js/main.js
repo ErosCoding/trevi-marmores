@@ -44,20 +44,6 @@ if (menuBtn && nav) {
   );
 }
 
-// Revelar ao rolar
-const observador = new IntersectionObserver(
-  (entradas) => {
-    entradas.forEach((e) => {
-      if (e.isIntersecting) {
-        e.target.classList.add("visivel");
-        observador.unobserve(e.target);
-      }
-    });
-  },
-  { threshold: 0.12 }
-);
-document.querySelectorAll(".revelar").forEach((el) => observador.observe(el));
-
 // Galeria: filtros e lightbox
 const galeria = document.querySelector(".galeria");
 if (galeria) {
