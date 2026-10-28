@@ -46,6 +46,9 @@ body {
 
 img { max-width: 100%; display: block; }
 ::selection { background: var(--ouro-claro); color: var(--grafite); }
+/* Superfícies do navegador também na paleta da marca */
+html { scrollbar-color: var(--verde) var(--pedra-2); accent-color: var(--verde); }
+input, textarea { caret-color: var(--ouro-texto); }
 [id] { scroll-margin-top: var(--topo-h); }
 
 /* Foco visível para teclado */
@@ -75,9 +78,6 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 .lead { font-size: 1.08rem; color: var(--texto-suave); max-width: 58ch; }
 .on-dark .lead { color: rgba(255, 255, 255, .72); }
 
-.gold-text {
-  background: var(--ouro-grad); -webkit-background-clip: text; background-clip: text; color: transparent;
-}
 
 /* Botões */
 .btn {
@@ -249,8 +249,8 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 .destaque-kit-texto { padding: clamp(50px, 7vw, 100px) clamp(24px, 6vw, 90px); display: flex; flex-direction: column; justify-content: center; }
 .preco-linha { display: flex; gap: 34px; margin: 1.2rem 0 2rem; flex-wrap: wrap; }
 .preco-linha div { font-size: .88rem; color: rgba(255,255,255,.65); }
+.preco-linha .preco-destaque { color: var(--ouro-claro); }
 .preco-linha strong { font-variant-numeric: tabular-nums; display: block; font-family: var(--serif); font-weight: 500; font-size: 2.4rem; letter-spacing: 0; text-transform: none; line-height: 1.1; }
-.selo-novo { display: inline-block; align-self: flex-start; background: var(--ouro-grad); color: var(--grafite); font-size: .8rem; font-weight: 700; padding: 4px 12px; margin-bottom: 1.2rem; border-radius: 2px; }
 @media (max-width: 860px) { .destaque-kit { grid-template-columns: 1fr; } .destaque-kit-img { aspect-ratio: 4/3; } }
 
 /* Projetos */
