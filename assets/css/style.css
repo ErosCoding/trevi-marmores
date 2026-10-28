@@ -1,5 +1,10 @@
 /* Trevi Mármores & Granitos — estilos globais */
 
+/* Fontes hospedadas no próprio site (latin), sem bloquear a primeira tela */
+@font-face { font-family: "Cormorant Garamond"; font-style: normal; font-weight: 500 600; font-display: swap; src: url(../fonts/cormorant.woff2) format("woff2"); }
+@font-face { font-family: "Cormorant Garamond"; font-style: italic; font-weight: 500; font-display: swap; src: url(../fonts/cormorant-italico.woff2) format("woff2"); }
+@font-face { font-family: "Montserrat"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(../fonts/montserrat.woff2) format("woff2"); }
+
 :root {
   --verde: #505b53;
   --verde-escuro: #3d4640;
@@ -25,6 +30,7 @@
   --sombra: 0 18px 40px -24px rgba(20, 24, 21, 0.45);
   --topo-h: 72px;
   --suave: cubic-bezier(.2, .7, .2, 1);
+  --expo: cubic-bezier(.16, 1, .3, 1);
 }
 
 *,
@@ -90,7 +96,11 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 }
 .btn:active { transform: translateY(1px); }
 .btn svg { width: 18px; height: 18px; flex: none; }
-.btn-ouro { background: var(--ouro-grad); color: var(--grafite); background-size: 140% 100%; }
+.btn-ouro { background: var(--ouro-grad); color: var(--grafite); background-size: 140% 100%; position: relative; overflow: hidden; isolation: isolate; }
+.btn-ouro::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.45) 50%, transparent 65%); transform: translateX(-120%); transition: transform .8s var(--expo); }
+.btn-ouro:hover::after { transform: translateX(120%); }
+.btn .seta-btn { transition: transform .35s var(--expo); }
+.btn:hover .seta-btn { transform: translateX(4px); }
 .btn-ouro:hover { background-position: 100% 0; transform: translateY(-1px); box-shadow: 0 10px 24px -12px rgba(154,122,64,.7); }
 .btn-ouro:active { transform: translateY(0); box-shadow: none; }
 .btn-linha { border-color: currentColor; color: inherit; background: transparent; }
@@ -103,10 +113,13 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 /* Cabeçalho */
 .topo {
   position: fixed; inset: 0 0 auto 0; z-index: 50;
-  transition: background .3s, box-shadow .3s, padding .3s;
-  padding: 18px 0;
+  padding: 18px 0; transition: padding .4s var(--expo);
 }
-.topo.solido, .topo.sempre-solido { background: rgba(61, 70, 64, .97); box-shadow: 0 1px 0 rgba(255,255,255,.06); padding: 10px 0; backdrop-filter: blur(8px); }
+/* O fundo fica num pseudo-elemento: anima só a opacidade e não cria contexto que prenda o menu fixo */
+.topo::before { content: ""; position: absolute; inset: 0; background: var(--verde-escuro); box-shadow: 0 1px 0 rgba(255,255,255,.06); opacity: 0; transition: opacity .4s var(--suave); pointer-events: none; }
+.topo.solido, .topo.sempre-solido { padding: 10px 0; }
+.topo.solido::before, .topo.sempre-solido::before { opacity: 1; }
+.topo .container { position: relative; }
 .topo .container { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .marca { display: block; position: relative; z-index: 2; }
 .marca img { height: 34px; width: auto; }
@@ -128,55 +141,110 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 .menu-btn[aria-expanded="true"] .l3 { transform: translateY(-5px) rotate(-45deg); }
 
 @media (max-width: 960px) {
-  .menu-btn { display: block; }
+  .menu-btn { display: block; position: relative; z-index: 2; }
   .nav {
-    position: fixed; inset: 0; background: var(--grafite);
-    flex-direction: column; align-items: flex-start; justify-content: center; gap: 6px;
-    padding: 90px var(--gutter) 40px;
-    opacity: 0; visibility: hidden; transition: opacity .3s, visibility 0s .3s;
+    position: fixed; inset: 0; z-index: 1; height: 100vh; height: 100dvh; background: var(--grafite);
+    flex-direction: column; align-items: stretch; justify-content: center; gap: 0;
+    padding: 96px var(--gutter) calc(32px + env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain;
+    clip-path: inset(0 0 100% 0); visibility: hidden;
+    transition: clip-path .6s var(--expo), visibility 0s .6s;
   }
-  .nav.aberto { opacity: 1; visibility: visible; transition: opacity .3s; }
+  .nav.aberto { clip-path: inset(0); visibility: visible; transition: clip-path .6s var(--expo); }
+  .nav::after { content: ""; position: absolute; right: -60px; bottom: -40px; width: 320px; aspect-ratio: 664/330; background: url(../img/logo-simbolo-sm.png) center/contain no-repeat; opacity: .06; pointer-events: none; }
   /* Links do menu entram em sequência */
-  .nav a { opacity: 0; transform: translateY(12px); transition: opacity .4s var(--suave), transform .5s var(--suave); }
+  .nav a { opacity: 0; transform: translateY(18px); transition: opacity .5s var(--suave), transform .7s var(--expo); }
   .nav.aberto a { opacity: 1; transform: none; }
-  .nav.aberto a:nth-child(2) { transition-delay: .04s; }
-  .nav.aberto a:nth-child(3) { transition-delay: .08s; }
-  .nav.aberto a:nth-child(4) { transition-delay: .12s; }
-  .nav.aberto a:nth-child(5) { transition-delay: .16s; }
-  .nav.aberto a:nth-child(6) { transition-delay: .2s; }
-  .nav a:not(.btn) { font-family: var(--serif); font-size: 2rem; font-weight: 500; color: #fff; padding: 4px 0; }
+  .nav.aberto a:nth-child(1) { transition-delay: .12s; }
+  .nav.aberto a:nth-child(2) { transition-delay: .16s; }
+  .nav.aberto a:nth-child(3) { transition-delay: .2s; }
+  .nav.aberto a:nth-child(4) { transition-delay: .24s; }
+  .nav.aberto a:nth-child(5) { transition-delay: .28s; }
+  .nav.aberto a:nth-child(6) { transition-delay: .32s; }
+  .nav a:not(.btn) { font-family: var(--serif); font-size: clamp(1.9rem, 8vw, 2.4rem); line-height: 1.15; font-weight: 500; color: #fff; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: baseline; gap: 14px; }
+  .nav a:not(.btn)::before { content: attr(data-n); font-family: var(--sans); font-size: .72rem; letter-spacing: .14em; color: var(--ouro); min-width: 22px; }
   .nav a:not(.btn)::after { display: none; }
-  .nav .selo { font-family: var(--sans); vertical-align: 10px; }
-  .nav .btn { margin-top: 22px; }
-  .menu-btn { position: relative; z-index: 2; }
+  .nav .selo { font-family: var(--sans); align-self: center; }
+  .nav .btn { margin-top: 28px; min-height: 54px; }
 }
 
 /* Hero */
 .hero {
-  position: relative; min-height: 100svh; display: flex; align-items: flex-end;
-  color: #fff; background: var(--grafite); overflow: hidden;
-  padding: 140px 0 clamp(60px, 10vh, 110px);
+  position: relative; min-height: 100vh; min-height: 100svh; display: flex; align-items: flex-end;
+  color: #fff; background: var(--grafite); overflow: hidden; isolation: isolate;
+  padding: 140px 0 clamp(96px, 14vh, 150px);
 }
-.hero-bg { position: absolute; inset: 0; }
-.hero-bg img { width: 100%; height: 100%; object-fit: cover; opacity: .6; transform: scale(1.04); animation: lento 18s ease-out forwards; }
+.hero-bg { position: absolute; inset: -6% 0 0 0; z-index: -2; will-change: transform; }
+.hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.6s var(--suave); }
+.hero-slide.ativo { opacity: 1; }
+.hero-slide picture { display: block; width: 100%; height: 100%; }
+.hero-slide img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.12); }
+.hero-slide.ativo img { animation: zoom-lento 9s linear forwards; }
+@keyframes zoom-lento { from { transform: scale(1.12); } to { transform: scale(1.02); } }
 .hero::after {
-  content: ""; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(43,50,45,.5) 0%, rgba(43,50,45,.1) 35%, rgba(43,50,45,.9) 100%),
-              linear-gradient(90deg, rgba(61,70,64,.88) 0%, rgba(61,70,64,0) 70%);
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(31,36,33,.55) 0%, rgba(31,36,33,.05) 30%, rgba(31,36,33,.25) 55%, rgba(31,36,33,.94) 100%),
+              linear-gradient(90deg, rgba(43,50,45,.85) 0%, rgba(43,50,45,0) 65%);
 }
-.hero .container { position: relative; z-index: 1; }
-.hero h1 { max-width: 13ch; }
-.hero h1 em { font-style: italic; }
-.hero .lead { margin-bottom: 2.2rem; font-size: clamp(1.05rem, 1.4vw, 1.18rem); }
+.hero .container { position: relative; z-index: 1; width: 100%; }
+.hero-conteudo { will-change: transform, opacity; }
+.sobretitulo { display: inline-flex; align-items: center; gap: 14px; font-size: .74rem; font-weight: 600; letter-spacing: .28em; text-transform: uppercase; color: var(--ouro-claro); margin-bottom: 1.6rem; }
+.sobretitulo::before { content: ""; width: 44px; height: 1px; background: var(--ouro); transform-origin: left; }
+.hero h1 { font-size: clamp(3rem, 8.4vw, 6.6rem); line-height: .98; letter-spacing: -.02em; margin-bottom: .45em; }
+.hero h1 em { font-style: italic; color: var(--ouro-claro); }
+.hero h1 .linha { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
+.hero h1 .linha > span { display: inline-block; }
+.hero .lead { margin-bottom: 2.2rem; font-size: clamp(1rem, 1.4vw, 1.15rem); max-width: 50ch; }
 .hero-acoes { display: flex; flex-wrap: wrap; gap: 14px; }
-/* Entrada única da página: o texto do hero surge sobre a foto */
-.hero h1, .hero .lead, .hero .hero-acoes { animation: surgir .9s var(--suave) both; }
-.hero .lead { animation-delay: .12s; }
-.hero .hero-acoes { animation-delay: .24s; }
-@keyframes lento { to { transform: scale(1); } }
-@keyframes surgir { from { opacity: 0; transform: translateY(14px); } }
+/* Entrada da página: linhas sobem por trás de uma máscara, o resto surge em seguida */
+.hero h1 .linha > span { animation: subir-linha 1.2s var(--expo) both; animation-delay: calc(.15s + var(--i, 0) * .12s); }
+.sobretitulo { animation: surgir 1s var(--expo) .05s both; }
+.sobretitulo::before { animation: crescer 1.2s var(--expo) .2s both; }
+.hero .lead { animation: surgir 1.1s var(--expo) .5s both; }
+.hero .hero-acoes { animation: surgir 1.1s var(--expo) .62s both; }
+.hero-rodape { animation: aparecer 1.4s var(--suave) .9s both; }
+@keyframes subir-linha { from { transform: translateY(105%); } }
+@keyframes crescer { from { transform: scaleX(0); } }
+@keyframes surgir { from { opacity: 0; transform: translateY(18px); } }
+@keyframes aparecer { from { opacity: 0; } }
+
+/* Faixa inferior do hero: legenda da foto, progresso e indicação de rolagem */
+.hero-rodape { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; border-top: 1px solid rgba(255,255,255,.12); }
+.hero-rodape .container { display: flex; align-items: center; justify-content: space-between; gap: 24px; height: 64px; }
+.hero-legenda { font-size: .8rem; color: rgba(255,255,255,.7); letter-spacing: .04em; display: flex; align-items: center; gap: 14px; min-width: 0; }
+.hero-legenda .num { font-variant-numeric: tabular-nums; color: var(--ouro-claro); font-weight: 600; letter-spacing: .1em; }
+.hero-legenda .txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: opacity .5s; }
+.hero-legenda .txt.trocando { opacity: 0; }
+.hero-pontos { display: flex; gap: 8px; }
+.hero-pontos button { width: 44px; height: 32px; background: none; border: 0; padding: 0; position: relative; }
+.hero-pontos button::before, .hero-pontos button::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: rgba(255,255,255,.25); }
+.hero-pontos button::after { background: var(--ouro); transform: scaleX(0); transform-origin: left; }
+.hero-pontos button.ativo::after { animation: progresso var(--duracao, 6s) linear forwards; }
+.hero-pontos button.visto::after { transform: scaleX(1); }
+@keyframes progresso { to { transform: scaleX(1); } }
+.rolar { display: inline-flex; align-items: center; gap: 12px; font-size: .72rem; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; color: rgba(255,255,255,.75); padding: 10px 0; }
+.rolar span { width: 1px; height: 28px; background: rgba(255,255,255,.25); position: relative; overflow: hidden; }
+.rolar span::after { content: ""; position: absolute; left: 0; top: 0; width: 1px; height: 50%; background: var(--ouro-claro); animation: descer 2s var(--suave) infinite; }
+@keyframes descer { from { transform: translateY(-100%); } to { transform: translateY(200%); } }
+
+/* Cartão do lançamento sobre o hero (telas grandes) */
+.hero-kit {
+  position: absolute; right: var(--gutter); bottom: 96px; z-index: 1; display: none;
+  grid-template-columns: 76px 1fr; gap: 16px; align-items: center; width: 300px; padding: 12px 18px 12px 12px;
+  background: rgba(31,36,33,.72); border: 1px solid rgba(230,211,161,.22); color: #fff;
+  transition: border-color .3s, transform .5s var(--expo); animation: surgir 1.2s var(--expo) 1.1s both;
+}
+.hero-kit:hover { border-color: var(--ouro); transform: translateY(-3px); }
+.hero-kit img { width: 76px; height: 76px; object-fit: cover; }
+.hero-kit small { display: block; font-size: .66rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--ouro-claro); }
+.hero-kit strong { display: block; font-family: var(--serif); font-weight: 500; font-size: 1.3rem; line-height: 1.15; margin: 2px 0; }
+.hero-kit span { font-size: .8rem; color: rgba(255,255,255,.7); }
+@media (min-width: 1100px) { .hero-kit { display: grid; } }
 @media (max-width: 560px) {
+  .hero { padding-bottom: 104px; }
+  .hero-pontos { display: none; }
   .hero .hero-acoes .btn { flex: 1 1 100%; }
+  .rolar { display: none; }
+  .hero-pontos button { width: 30px; }
 }
 
 /* Faixa de lançamento */
@@ -188,6 +256,14 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 .aviso a { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 14px var(--gutter); text-align: center; flex-wrap: wrap; }
 .aviso span.seta { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
 .aviso a:hover span.seta { text-decoration-thickness: 2px; }
+
+/* Faixa de materiais em movimento */
+.faixa { background: var(--pedra); border-block: 1px solid var(--linha); overflow: hidden; padding: 26px 0; }
+.faixa-trilho { display: flex; width: max-content; animation: deslizar 38s linear infinite; }
+.faixa.pausada .faixa-trilho { animation-play-state: paused; }
+.faixa-trilho span { font-family: var(--serif); font-style: italic; font-size: clamp(1.8rem, 3.6vw, 2.8rem); color: var(--verde); white-space: nowrap; display: inline-flex; align-items: center; }
+.faixa-trilho span::after { content: ""; width: 9px; height: 9px; margin: 0 clamp(26px, 4vw, 52px); background: var(--ouro); transform: rotate(45deg); }
+@keyframes deslizar { to { transform: translateX(-50%); } }
 
 /* Seções */
 .secao { padding: clamp(80px, 12vw, 140px) 0; }
@@ -213,10 +289,12 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 
 /* Serviços */
 .servicos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.1); }
-.servico { background: var(--verde); display: flex; flex-direction: column; }
+.servico { background: var(--verde); display: flex; flex-direction: column; position: relative; }
+.servico::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--ouro); transform: scaleX(0); transform-origin: left; transition: transform .6s var(--expo); }
+.servico:hover::after, .servico:focus-within::after { transform: scaleX(1); }
 .servico-img { aspect-ratio: 4/5; overflow: hidden; }
-.servico-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--suave), filter .6s; filter: saturate(.85); }
-.servico:hover .servico-img img, .servico:focus-within .servico-img img { transform: scale(1.04); filter: saturate(1); }
+.servico-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--expo); }
+.servico:hover .servico-img img, .servico:focus-within .servico-img img { transform: scale(1.06); }
 .servico-corpo { padding: 26px 24px 30px; display: flex; flex-direction: column; flex: 1; }
 .servico-corpo p { color: rgba(255,255,255,.72); font-size: .92rem; flex: 1; }
 .link-ouro {
@@ -231,7 +309,8 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 
 /* Materiais */
 .materiais { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-.material { background: var(--branco); display: flex; flex-direction: column; }
+.material { background: var(--branco); display: flex; flex-direction: column; transition: transform .6s var(--expo), box-shadow .6s var(--expo); }
+@media (hover: hover) { .material:hover { transform: translateY(-6px); box-shadow: var(--sombra); } }
 .material-img { aspect-ratio: 16/10; overflow: hidden; }
 .material-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--suave); }
 .material:hover .material-img img, .material:focus-within .material-img img { transform: scale(1.05); }
@@ -265,7 +344,6 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 .galeria img { width: 100%; height: 100%; object-fit: cover; transition: transform .9s var(--suave), opacity .4s; }
 .galeria figure:focus-visible { outline-offset: 2px; }
 .galeria figure.entrando { animation: aparecer .45s var(--suave) both; }
-@keyframes aparecer { from { opacity: 0; } }
 @media (max-width: 860px) { .galeria { grid-template-columns: repeat(2, 1fr); gap: 8px; } }
 .galeria figure:hover img, .galeria figure:focus-visible img { transform: scale(1.03); }
 .galeria figcaption {
@@ -363,12 +441,22 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .35s; }
 
 /* Revelar ao rolar: só com JS ativo; sem JS tudo aparece normalmente */
-.js .revelar { opacity: 0; transform: translateY(22px); transition: opacity .9s var(--suave), transform .9s var(--suave); transition-delay: var(--atraso, 0s); }
+.js .revelar { opacity: 0; transform: translateY(28px); transition: opacity 1s var(--suave), transform 1.2s var(--expo); transition-delay: var(--atraso, 0s); }
 .js .revelar.visivel { opacity: 1; transform: none; }
-.js .revelar-foto { overflow: hidden; }
-.js .revelar-foto img { transform: scale(1.08); transition: transform 1.6s var(--suave); }
+/* Fotos: revelação em cortina, de baixo para cima */
+/* (uma cortina da cor do fundo recolhe; a foto continua "visível" para o carregamento preguiçoso) */
+.js .revelar-foto { position: relative; }
+.js .revelar-foto::after { content: ""; position: absolute; inset: -1px; z-index: 2; background: var(--cortina, var(--pedra)); transform-origin: top; transition: transform 1.3s var(--expo); transition-delay: var(--atraso, 0s); pointer-events: none; }
+.js .revelar-foto.visivel::after { transform: scaleY(0); }
+.js .revelar-foto img { transform: scale(1.15); transition: transform 1.8s var(--expo); transition-delay: var(--atraso, 0s); }
 .js .revelar-foto.visivel img { transform: none; }
-.js .produto-info > * { animation: surgir .8s var(--suave) both; }
+.secao-escura { --cortina: var(--verde); }
+.secao-verde { --cortina: var(--grafite); }
+/* Títulos: o texto sobe por trás de uma máscara */
+.js .titulo-mascara { overflow: hidden; padding-bottom: .1em; margin-bottom: calc(.5em - .1em); }
+.js .titulo-mascara > span { display: block; transform: translateY(105%); transition: transform 1.2s var(--expo); }
+.js .titulo-mascara.visivel > span { transform: none; }
+.js .produto-info > * { animation: surgir .9s var(--expo) both; }
 .js .produto-info > :nth-child(2) { animation-delay: .06s; }
 .js .produto-info > :nth-child(3) { animation-delay: .12s; }
 .js .produto-info > :nth-child(n+4) { animation-delay: .18s; }

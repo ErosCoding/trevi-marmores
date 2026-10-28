@@ -18,13 +18,27 @@ document.querySelectorAll("[data-wa]").forEach((el) => {
   el.rel = "noopener";
 });
 
-// Cabeçalho sólido ao rolar
+const reduzir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Rolagem: cabeçalho sólido e parallax leve do hero, num único quadro por vez
 const topo = document.querySelector(".topo");
-if (topo && !topo.classList.contains("sempre-solido")) {
-  const atualizar = () => topo.classList.toggle("solido", window.scrollY > 40);
-  atualizar();
-  window.addEventListener("scroll", atualizar, { passive: true });
-}
+const heroBg = document.querySelector(".hero-bg");
+const heroConteudo = document.querySelector(".hero-conteudo");
+let agendado = false;
+const aoRolar = () => {
+  agendado = false;
+  const y = window.scrollY;
+  if (topo && !topo.classList.contains("sempre-solido")) topo.classList.toggle("solido", y > 40);
+  if (heroBg && !reduzir && y < window.innerHeight * 1.2) {
+    heroBg.style.transform = "translate3d(0," + (y * 0.25).toFixed(1) + "px,0)";
+    heroConteudo.style.transform = "translate3d(0," + (y * 0.12).toFixed(1) + "px,0)";
+    heroConteudo.style.opacity = Math.max(0, 1 - y / (window.innerHeight * 0.75)).toFixed(3);
+  }
+};
+aoRolar();
+window.addEventListener("scroll", () => {
+  if (!agendado) { agendado = true; requestAnimationFrame(aoRolar); }
+}, { passive: true });
 
 // Menu mobile
 const menuBtn = document.querySelector(".menu-btn");
@@ -40,10 +54,63 @@ if (menuBtn && nav) {
   menuBtn.addEventListener("click", () => definirMenu(!nav.classList.contains("aberto")));
   nav.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => definirMenu(false)));
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && nav.classList.contains("aberto")) {
+    if (!nav.classList.contains("aberto")) return;
+    if (e.key === "Escape") {
       definirMenu(false);
       menuBtn.focus();
     }
+    // Mantém o foco entre o botão e os links do menu aberto
+    if (e.key === "Tab") {
+      const focaveis = [menuBtn, ...nav.querySelectorAll("a")];
+      const i = focaveis.indexOf(document.activeElement);
+      e.preventDefault();
+      focaveis[(i + (e.shiftKey ? -1 : 1) + focaveis.length) % focaveis.length].focus();
+    }
+  });
+  // Ao voltar para a tela larga, o menu de celular fecha sozinho
+  window.matchMedia("(min-width: 961px)").addEventListener("change", (m) => m.matches && definirMenu(false));
+}
+
+// Hero: fotos de projetos alternando com zoom lento
+const slides = [...document.querySelectorAll(".hero-slide")];
+if (slides.length > 1) {
+  const pontos = [...document.querySelectorAll(".hero-pontos button")];
+  const num = document.querySelector(".hero-legenda .num");
+  const txt = document.querySelector(".hero-legenda .txt");
+  const celular = window.matchMedia("(max-width: 700px)");
+  const DURACAO = 6500;
+  let atual = 0;
+  let timer;
+  const legenda = (i) => slides[i].dataset[celular.matches ? "legendaCelular" : "legenda"];
+  const ir = (i) => {
+    slides[atual].classList.remove("ativo");
+    atual = (i + slides.length) % slides.length;
+    slides[atual].classList.add("ativo");
+    pontos.forEach((p, j) => {
+      p.classList.toggle("ativo", j === atual);
+      p.classList.toggle("visto", j < atual);
+      p.setAttribute("aria-pressed", j === atual);
+    });
+    num.textContent = "0" + (atual + 1) + " / 0" + slides.length;
+    txt.classList.add("trocando");
+    setTimeout(() => { txt.textContent = legenda(atual); txt.classList.remove("trocando"); }, 350);
+    // Pré-carrega a próxima foto
+    slides[(atual + 1) % slides.length].querySelector("img").loading = "eager";
+    agendar();
+  };
+  const agendar = () => {
+    clearTimeout(timer);
+    if (!reduzir && !document.hidden) timer = setTimeout(() => ir(atual + 1), DURACAO);
+  };
+  document.querySelector(".hero-pontos").style.setProperty("--duracao", DURACAO + "ms");
+  if (reduzir) pontos.forEach((p) => p.style.setProperty("--duracao", "0s"));
+  pontos.forEach((p, j) => p.addEventListener("click", () => ir(j)));
+  document.addEventListener("visibilitychange", agendar);
+  txt.textContent = legenda(0);
+  // A primeira troca só começa depois que a página carregou
+  window.addEventListener("load", () => {
+    slides[1].querySelector("img").loading = "eager";
+    agendar();
   });
 }
 
@@ -255,13 +322,13 @@ if (kit) {
 }
 
 // Revelar ao rolar: blocos surgem com suavidade; os que entram juntos vêm em sequência
-const reduzir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const ALVOS = [
   ".cabeca", ".sobre > div:last-child", ".valores li", ".servico", ".destaque-kit-texto",
   ".material", ".filtros", ".galeria figure", ".passo", ".orcamento > div", ".form",
   ".ficha > div", ".comparativo > div", ".faq-wrap > h2", ".faq details", ".rodape-grade > div",
 ];
-const FOTOS = [".sobre-fotos", ".destaque-kit-img"];
+const FOTOS = [".sobre-fotos", ".destaque-kit-img", ".servico-img"];
+const TITULOS = [".secao h2:not(.rodape-titulo)", ".destaque-kit-texto h2", ".produto-topo ~ section h2"];
 if (!reduzir && "IntersectionObserver" in window) {
   const observador = new IntersectionObserver(
     (entradas) =>
@@ -282,14 +349,29 @@ if (!reduzir && "IntersectionObserver" in window) {
     el.classList.add("revelar-foto");
     observador.observe(el);
   });
+  // Títulos: o texto sobe por trás de uma máscara
+  document.querySelectorAll(TITULOS.join(",")).forEach((h) => {
+    if (h.closest(".titulo-mascara") || h.classList.contains("titulo-mascara")) return;
+    const span = document.createElement("span");
+    span.append(...h.childNodes);
+    h.append(span);
+    h.classList.add("titulo-mascara");
+    observador.observe(h);
+  });
   // Na impressão tudo precisa estar visível
   window.addEventListener("beforeprint", () =>
-    document.querySelectorAll(".revelar, .revelar-foto").forEach((el) => el.classList.add("visivel"))
+    document.querySelectorAll(".revelar, .revelar-foto, .titulo-mascara").forEach((el) => el.classList.add("visivel"))
   );
   // Ao filtrar a galeria, as fotos já aparecem sem esperar a rolagem
   document.querySelectorAll(".filtro").forEach((b) =>
     b.addEventListener("click", () => document.querySelectorAll(".galeria figure").forEach((f) => f.classList.add("visivel")))
   );
+}
+
+// A faixa de materiais só se move quando está na tela
+const faixa = document.querySelector(".faixa");
+if (faixa && "IntersectionObserver" in window) {
+  new IntersectionObserver(([e]) => faixa.classList.toggle("pausada", !e.isIntersecting)).observe(faixa);
 }
 
 // Ano no rodapé
