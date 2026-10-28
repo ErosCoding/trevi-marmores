@@ -287,6 +287,16 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 .valores span { color: var(--texto-suave); font-size: .95rem; }
 @media (max-width: 860px) { .sobre { grid-template-columns: 1fr; } .sobre-fotos { max-width: 520px; } }
 
+/* "A Trevi" em colagem editorial (inspirada no Editorial Collage Hero do 21st.dev) */
+.colagem { aspect-ratio: 5/6; }
+.colagem::before { content: ""; position: absolute; left: 10%; top: 6%; width: 62%; height: 74%; border: 1px solid var(--ouro); z-index: 0; }
+.sobre-fotos.colagem img { position: absolute; object-fit: cover; box-shadow: var(--sombra); border: 0; }
+.sobre-fotos.colagem .c1 { inset: 0 auto auto 0; width: 58%; height: 70%; z-index: 1; }
+.sobre-fotos.colagem .c2 { inset: 16% 0 auto auto; right: 0; top: 16%; width: 40%; height: 46%; z-index: 2; }
+.sobre-fotos.colagem .c3 { inset: auto auto 0 30%; left: 30%; bottom: 0; width: 34%; height: 44%; z-index: 3; border: 8px solid var(--pedra) !important; }
+.colagem-selo { position: absolute; right: 4%; bottom: 10%; z-index: 4; width: 116px; height: 116px; border-radius: 50%; display: grid; place-items: center; text-align: center; background: var(--verde); color: var(--ouro-claro); font-family: var(--serif); font-style: italic; font-size: 1.15rem; line-height: 1.1; box-shadow: var(--sombra); }
+@media (max-width: 560px) { .colagem-selo { width: 92px; height: 92px; font-size: .95rem; } }
+
 /* Serviços */
 .servicos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.1); }
 .servico { background: var(--verde); display: flex; flex-direction: column; position: relative; }
@@ -306,6 +316,36 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 .link-ouro:hover { text-underline-offset: 8px; }
 @media (max-width: 1024px) { .servicos { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .servicos { grid-template-columns: 1fr; } .servico-img { aspect-ratio: 16/11; } }
+
+/* "O que fazemos" em acordeão de fotos (inspirado no Interactive Image Accordion do 21st.dev) */
+.acordeao { display: flex; gap: 10px; height: clamp(480px, 62vh, 620px); background: none; border: 0; }
+.acordeao .servico { flex: 1; min-width: 0; overflow: hidden; cursor: pointer; background: var(--verde-escuro); transition: flex 1s var(--expo); }
+.acordeao .servico.aberto { flex: 3.6; cursor: default; }
+.acordeao .servico::after { z-index: 3; }
+.acordeao .servico-img { position: absolute; inset: 0; aspect-ratio: auto; }
+.acordeao .servico-img img { transition: transform 1.4s var(--expo), filter .8s; filter: brightness(.6) saturate(.8); }
+.acordeao .servico.aberto .servico-img img { filter: brightness(.9) saturate(1); }
+.acordeao .servico::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(0deg, rgba(31,36,33,.95) 0%, rgba(31,36,33,.4) 45%, rgba(31,36,33,0) 70%); pointer-events: none; }
+.acordeao .servico-corpo { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: clamp(20px, 2.6vw, 34px); flex: none; }
+.servico-num { display: block; font-size: .72rem; font-weight: 600; letter-spacing: .2em; color: var(--ouro-claro); margin-bottom: 8px; }
+.acordeao .servico h3 { white-space: nowrap; font-size: clamp(1.4rem, 2vw, 1.9rem); margin-bottom: .3em; }
+.acordeao .servico-corpo p, .acordeao .servico-corpo .link-ouro { opacity: 0; transform: translateY(12px); transition: opacity .4s, transform .6s var(--expo); max-width: 46ch; }
+.acordeao .servico.aberto .servico-corpo p, .acordeao .servico.aberto .servico-corpo .link-ouro { opacity: 1; transform: none; transition-delay: .35s; }
+/* Painel fechado: título na vertical */
+@media (min-width: 861px) {
+  .acordeao .servico:not(.aberto) .servico-corpo { left: 50%; right: auto; bottom: 30px; padding: 0; transform: translateX(-50%); }
+  .acordeao .servico:not(.aberto) h3 { writing-mode: vertical-rl; transform: rotate(180deg); margin: 0; }
+  .acordeao .servico:not(.aberto) .servico-num { text-align: center; margin: 0 0 14px; }
+  .acordeao .servico:not(.aberto) .servico-corpo p, .acordeao .servico:not(.aberto) .servico-corpo .link-ouro { display: none; }
+}
+@media (max-width: 860px) {
+  .acordeao { flex-direction: column; height: auto; }
+  .acordeao .servico, .acordeao .servico.aberto { flex: none; height: 96px; transition: height .9s var(--expo); }
+  .acordeao .servico.aberto { height: 420px; }
+  .acordeao .servico:not(.aberto) .servico-corpo { padding-bottom: 18px; }
+  .acordeao .servico:not(.aberto) .servico-corpo p, .acordeao .servico:not(.aberto) .servico-corpo .link-ouro { display: none; }
+  .acordeao .servico:not(.aberto) h3 { margin: 0; }
+}
 
 /* Materiais */
 .materiais { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }

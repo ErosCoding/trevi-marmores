@@ -327,7 +327,7 @@ const ALVOS = [
   ".material", ".filtros", ".galeria figure", ".passo", ".kit-split-texto", ".vitrine-texto", ".orcamento > div", ".form",
   ".ficha > div", ".comparativo > div", ".faq-wrap > h2", ".faq details", ".rodape-grade > div",
 ];
-const FOTOS = [".sobre-fotos", ".destaque-kit-img", ".servico-img", ".kit-card"];
+const FOTOS = [".sobre-fotos", ".destaque-kit-img", ".kit-card"];
 const TITULOS = [".secao h2:not(.rodape-titulo)", ".destaque-kit-texto h2", ".produto-topo ~ section h2"];
 if (!reduzir && "IntersectionObserver" in window) {
   const observador = new IntersectionObserver(
@@ -366,6 +366,22 @@ if (!reduzir && "IntersectionObserver" in window) {
   document.querySelectorAll(".filtro").forEach((b) =>
     b.addEventListener("click", () => document.querySelectorAll(".galeria figure").forEach((f) => f.classList.add("visivel")))
   );
+}
+
+// "O que fazemos": o painel abre ao passar o mouse, tocar ou chegar pelo teclado
+const acordeao = document.querySelector(".acordeao");
+if (acordeao) {
+  const paineis = [...acordeao.querySelectorAll(".servico")];
+  const abrir = (p) => paineis.forEach((x) => x.classList.toggle("aberto", x === p));
+  const temMouse = window.matchMedia("(hover: hover)").matches;
+  paineis.forEach((p) => {
+    if (temMouse) p.addEventListener("mouseenter", () => abrir(p));
+    p.addEventListener("focusin", () => abrir(p));
+    p.addEventListener("click", (e) => {
+      // No painel fechado, o primeiro toque só abre; o link vale quando já está aberto
+      if (!p.classList.contains("aberto")) { e.preventDefault(); abrir(p); }
+    });
+  });
 }
 
 // Vitrine: cada camada de fotos sobe numa velocidade, conforme o progresso da rolagem
