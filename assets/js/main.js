@@ -324,7 +324,7 @@ if (kit) {
 // Revelar ao rolar: blocos surgem com suavidade; os que entram juntos vêm em sequência
 const ALVOS = [
   ".cabeca", ".sobre > div:last-child", ".valores li", ".servico", ".destaque-kit-texto",
-  ".material", ".filtros", ".galeria figure", ".passo", ".kit-split-texto", ".vitrine-texto", ".orcamento > div", ".form",
+  ".material", ".filtros", ".galeria figure", ".passo", ".kit-split-texto", ".orcamento > div", ".form",
   ".ficha > div", ".comparativo > div", ".faq-wrap > h2", ".faq details", ".rodape-grade > div",
 ];
 const FOTOS = [".sobre-fotos", ".destaque-kit-img", ".kit-card"];
@@ -384,19 +384,26 @@ if (acordeao) {
   });
 }
 
-// Vitrine: cada camada de fotos sobe numa velocidade, conforme o progresso da rolagem
+// Vitrine: a foto central cresce até ocupar a tela e as outras se afastam
 const vitrine = document.querySelector(".vitrine");
 if (vitrine && !reduzir) {
-  const camadas = [...vitrine.querySelectorAll(".vitrine-camada")];
+  const ESCALAS = [4, 5, 6, 5, 6, 8, 9];
+  const itens = [...vitrine.querySelectorAll(".zoom-item")];
+  const texto = vitrine.querySelector(".vitrine-texto");
   let ativa = false;
   let pedido = false;
   const mover = () => {
     pedido = false;
     const r = vitrine.getBoundingClientRect();
-    const p = -r.top / window.innerHeight; // 0 quando a seção chega ao topo
-    camadas.forEach((c) => {
-      c.style.transform = "translate3d(0," + (-p * Number(c.dataset.vel) * 60).toFixed(2) + "vh,0)";
+    const total = r.height - window.innerHeight;
+    const p = Math.min(1, Math.max(0, -r.top / total));
+    // Zoom até 85% do percurso; o restante fica parado com o texto
+    const z = Math.min(1, p / 0.85);
+    const suave = 1 - Math.pow(1 - z, 2);
+    itens.forEach((it, i) => {
+      it.style.transform = "scale(" + (1 + (ESCALAS[i] - 1) * suave).toFixed(3) + ")";
     });
+    texto.classList.toggle("visivel-zoom", p > 0.78);
   };
   const agendarVitrine = () => { if (ativa && !pedido) { pedido = true; requestAnimationFrame(mover); } };
   new IntersectionObserver(([e]) => { ativa = e.isIntersecting; agendarVitrine(); }).observe(vitrine);
