@@ -324,10 +324,10 @@ if (kit) {
 // Revelar ao rolar: blocos surgem com suavidade; os que entram juntos vêm em sequência
 const ALVOS = [
   ".cabeca", ".sobre > div:last-child", ".valores li", ".servico", ".destaque-kit-texto",
-  ".material", ".filtros", ".galeria figure", ".passo", ".orcamento > div", ".form",
+  ".material", ".filtros", ".galeria figure", ".passo", ".kit-split-texto", ".vitrine-texto", ".orcamento > div", ".form",
   ".ficha > div", ".comparativo > div", ".faq-wrap > h2", ".faq details", ".rodape-grade > div",
 ];
-const FOTOS = [".sobre-fotos", ".destaque-kit-img", ".servico-img"];
+const FOTOS = [".sobre-fotos", ".destaque-kit-img", ".servico-img", ".kit-card"];
 const TITULOS = [".secao h2:not(.rodape-titulo)", ".destaque-kit-texto h2", ".produto-topo ~ section h2"];
 if (!reduzir && "IntersectionObserver" in window) {
   const observador = new IntersectionObserver(
@@ -366,6 +366,32 @@ if (!reduzir && "IntersectionObserver" in window) {
   document.querySelectorAll(".filtro").forEach((b) =>
     b.addEventListener("click", () => document.querySelectorAll(".galeria figure").forEach((f) => f.classList.add("visivel")))
   );
+}
+
+// Vitrine: cada camada de fotos sobe numa velocidade, conforme o progresso da rolagem
+const vitrine = document.querySelector(".vitrine");
+if (vitrine && !reduzir) {
+  const camadas = [...vitrine.querySelectorAll(".vitrine-camada")];
+  let ativa = false;
+  let pedido = false;
+  const mover = () => {
+    pedido = false;
+    const r = vitrine.getBoundingClientRect();
+    const p = -r.top / window.innerHeight; // 0 quando a seção chega ao topo
+    camadas.forEach((c) => {
+      c.style.transform = "translate3d(0," + (-p * Number(c.dataset.vel) * 60).toFixed(2) + "vh,0)";
+    });
+  };
+  const agendarVitrine = () => { if (ativa && !pedido) { pedido = true; requestAnimationFrame(mover); } };
+  new IntersectionObserver(([e]) => { ativa = e.isIntersecting; agendarVitrine(); }).observe(vitrine);
+  // As fotos da vitrine começam a carregar uma tela antes de a seção aparecer
+  new IntersectionObserver(([e], o) => {
+    if (!e.isIntersecting) return;
+    vitrine.querySelectorAll("img").forEach((img) => (img.loading = "eager"));
+    o.disconnect();
+  }, { rootMargin: "100% 0px" }).observe(vitrine);
+  window.addEventListener("scroll", agendarVitrine, { passive: true });
+  mover();
 }
 
 // A faixa de materiais só se move quando está na tela

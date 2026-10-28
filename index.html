@@ -195,21 +195,40 @@
     </div>
   </section>
 
-  <!-- Destaque Kit Lavabo -->
-  <section class="secao-verde on-dark">
-    <div class="destaque-kit">
-      <div class="destaque-kit-img"><img src="assets/img/kit/kit-6.webp" alt="Kit Lavabo Trevi com bandeja em mármore verde, porta-sabonete e difusor" loading="lazy" decoding="async"></div>
-      <div class="destaque-kit-texto">
-        <h2>Kit Lavabo em pedra natural</h2>
-        <p class="lead">Bandeja de 28 × 15 cm em mármore ou granito, maior que os modelos comuns do mercado. Escolha a pedra e leve só a bandeja ou o kit completo com porta-sabonete líquido e difusor.</p>
-        <div class="preco-linha">
-          <div><strong>R$ 99</strong>Só a bandeja</div>
-          <div><strong class="preco-destaque">R$ 150</strong>Kit completo</div>
-        </div>
+  <!-- Destaque Kit Lavabo: texto + cartões de foto (inspirado no Split Hero With Image Cards do 21st.dev) -->
+  <section class="secao secao-verde on-dark kit-split">
+    <div class="container kit-split-grade">
+      <div class="kit-split-texto">
+        <p class="sobretitulo">Novidade · primeira peça da linha</p>
+        <h2>Kit Lavabo em <em>pedra natural.</em></h2>
+        <p class="lead">Bandeja de 28 × 15 cm, 40% maior que a medida comum de 25 × 12. Leve só a bandeja ou o kit completo com porta-sabonete líquido e difusor.</p>
+        <dl class="kit-split-precos">
+          <div><dt>Só a bandeja</dt><dd>R$ 99</dd></div>
+          <div><dt>Kit completo · 3 peças</dt><dd>R$ 150</dd></div>
+        </dl>
         <div class="hero-acoes">
-          <a class="btn btn-ouro" href="kit-lavabo.html">Ver o kit <svg class="seta-btn" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
-          <a class="btn btn-linha" data-wa="Olá, Trevi! Vim pelo site e tenho interesse no Kit Lavabo. Pode me passar as pedras disponíveis?">Pedir pelo WhatsApp</a>
+          <a class="btn btn-ouro" href="kit-lavabo.html">Montar meu kit <svg class="seta-btn" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
         </div>
+      </div>
+      <div class="kit-split-cards">
+        <article class="kit-card">
+          <img src="assets/img/kit/kit-6-sm.webp" srcset="assets/img/kit/kit-6-sm.webp 640w, assets/img/kit/kit-6.webp 960w" sizes="(max-width: 860px) 50vw, 26vw" alt="Kit Lavabo com bandeja em mármore verde" width="960" height="1280" loading="lazy" decoding="async">
+          <div class="kit-card-texto">
+            <span class="kit-card-rotulo">Bandeja 28 × 15 cm</span>
+            <h3>Em mármore</h3>
+            <p>a partir de <strong>R$ 99</strong></p>
+            <a class="kit-card-btn" data-wa="Olá, Trevi! Vim pelo site e quero o Kit Lavabo com bandeja em mármore. Pode me mostrar as pedras disponíveis?">Pedir em mármore <svg class="seta-btn" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+          </div>
+        </article>
+        <article class="kit-card invertido">
+          <img src="assets/img/kit/kit-1-sm.webp" srcset="assets/img/kit/kit-1-sm.webp 640w, assets/img/kit/kit-1.webp 960w" sizes="(max-width: 860px) 50vw, 26vw" alt="Kit Lavabo com bandeja em granito preto" width="960" height="1280" loading="lazy" decoding="async">
+          <div class="kit-card-texto">
+            <span class="kit-card-rotulo">Bandeja 28 × 15 cm</span>
+            <h3>Em granito</h3>
+            <p>a partir de <strong>R$ 99</strong></p>
+            <a class="kit-card-btn" data-wa="Olá, Trevi! Vim pelo site e quero o Kit Lavabo com bandeja em granito. Pode me mostrar as pedras disponíveis?">Pedir em granito <svg class="seta-btn" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -286,6 +305,29 @@
             <a class="link-ouro" data-wa="Olá, Trevi! Vim pelo site e gostaria de saber mais sobre limestone para o meu projeto.">Perguntar sobre limestone</a>
           </div>
         </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vitrine com parallax (inspirada no Parallax Scrolling da Osmo, via 21st.dev) -->
+  <section class="vitrine" aria-label="Vitrine de projetos">
+    <div class="vitrine-palco">
+      <div class="vitrine-camada" data-vel="0.35">
+        <img class="v1" src="assets/img/obras/obra-07-sm.webp" alt="" loading="lazy" decoding="async">
+        <img class="v2" src="assets/img/obras/obra-12.webp" alt="" loading="lazy" decoding="async">
+      </div>
+      <div class="vitrine-camada" data-vel="0.7">
+        <img class="v3" src="assets/img/obras/obra-23-sm.webp" alt="" loading="lazy" decoding="async">
+        <img class="v4" src="assets/img/obras/obra-30-sm.webp" alt="" loading="lazy" decoding="async">
+      </div>
+      <div class="vitrine-camada" data-vel="1.1">
+        <img class="v5" src="assets/img/obras/obra-33.webp" alt="" loading="lazy" decoding="async">
+        <img class="v6" src="assets/img/obras/obra-01-sm.webp" alt="" loading="lazy" decoding="async">
+      </div>
+      <div class="vitrine-texto">
+        <p class="sobretitulo">Portfólio</p>
+        <h2>Cada peça,<br><em>um projeto.</em></h2>
+        <a class="btn btn-linha" href="#projetos">Ver projetos entregues <svg class="seta-btn" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
       </div>
     </div>
   </section>

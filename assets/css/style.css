@@ -332,6 +332,70 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 .preco-linha strong { font-variant-numeric: tabular-nums; display: block; font-family: var(--serif); font-weight: 500; font-size: 2.4rem; letter-spacing: 0; text-transform: none; line-height: 1.1; }
 @media (max-width: 860px) { .destaque-kit { grid-template-columns: 1fr; } .destaque-kit-img { aspect-ratio: 4/3; } }
 
+/* Kit Lavabo: texto + cartões de foto */
+.kit-split-grade { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(40px, 6vw, 90px); align-items: center; }
+.kit-split h2 { font-size: clamp(2.4rem, 5vw, 4rem); line-height: 1.02; }
+.kit-split h2 em { font-style: italic; color: var(--ouro-claro); }
+.kit-split-precos { display: flex; gap: 0; margin: 1.6rem 0 2.2rem; border-block: 1px solid rgba(255,255,255,.12); }
+.kit-split-precos div { flex: 1; padding: 18px 0; }
+.kit-split-precos div + div { border-left: 1px solid rgba(255,255,255,.12); padding-left: 24px; }
+.kit-split-precos dt { font-size: .82rem; color: rgba(255,255,255,.65); }
+.kit-split-precos dd { margin: 0; font-family: var(--serif); font-size: 2.4rem; line-height: 1.1; color: var(--ouro-claro); font-variant-numeric: tabular-nums; }
+.kit-split-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+.kit-card { position: relative; overflow: hidden; aspect-ratio: 3/4; background: var(--verde-escuro); }
+.kit-card + .kit-card { margin-top: 64px; }
+.kit-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--expo); }
+.kit-card::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(0deg, rgba(31,36,33,.92) 0%, rgba(31,36,33,.35) 42%, rgba(31,36,33,0) 65%); transition: opacity .6s; }
+.kit-card-texto { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: clamp(18px, 2.4vw, 30px); }
+.kit-card-rotulo { font-size: .66rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--ouro-claro); }
+.kit-card h3 { font-size: clamp(1.6rem, 2.4vw, 2.2rem); margin: 4px 0 2px; }
+.kit-card p { margin: 0 0 14px; font-size: .88rem; color: rgba(255,255,255,.75); }
+.kit-card p strong { color: #fff; font-weight: 600; }
+.kit-card-btn { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 600; padding: 10px 16px; background: var(--pedra); color: var(--grafite); transition: background-color .25s, color .25s; }
+.kit-card-btn svg { width: 16px; height: 16px; transition: transform .35s var(--expo); }
+.kit-card-btn:hover { background: var(--ouro-claro); }
+.kit-card-btn:hover svg { transform: translateX(4px); }
+.kit-card.invertido .kit-card-btn { background: transparent; color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.6); }
+.kit-card.invertido .kit-card-btn:hover { background: #fff; color: var(--grafite); }
+@media (hover: hover) { .kit-card:hover img { transform: scale(1.06); } }
+@media (max-width: 860px) {
+  .kit-split-grade { grid-template-columns: 1fr; }
+  .kit-card + .kit-card { margin-top: 40px; }
+}
+@media (max-width: 560px) {
+  .kit-split-cards { grid-template-columns: 1fr; gap: 14px; }
+  .kit-card { aspect-ratio: 4/5; }
+  .kit-card + .kit-card { margin-top: 0; }
+}
+
+/* Vitrine com parallax: camadas de fotos em velocidades diferentes */
+.vitrine { position: relative; height: 180vh; background: var(--grafite); color: #fff; }
+.vitrine-palco { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; display: grid; place-items: center; }
+.vitrine-camada { position: absolute; inset: 0; will-change: transform; pointer-events: none; }
+.vitrine-camada img { position: absolute; object-fit: cover; box-shadow: 0 30px 60px -30px rgba(0,0,0,.7); }
+.vitrine-camada:nth-child(1) img { filter: brightness(.55); }
+.vitrine-camada:nth-child(2) img { filter: brightness(.75); }
+.v1 { width: 26vw; aspect-ratio: 4/3; left: 4vw; top: 14%; }
+.v2 { width: 13vw; aspect-ratio: 9/20; right: 8vw; top: 6%; }
+.v3 { width: 17vw; aspect-ratio: 9/16; left: 14vw; top: 62%; }
+.v4 { width: 24vw; aspect-ratio: 16/9; right: 3vw; top: 58%; }
+.v5 { width: 11vw; aspect-ratio: 9/20; left: 30vw; top: 92%; }
+.v6 { width: 15vw; aspect-ratio: 9/16; right: 22vw; top: 98%; }
+.vitrine-texto { position: relative; z-index: 2; text-align: center; padding: 0 var(--gutter); }
+.vitrine-texto .sobretitulo { justify-content: center; }
+.vitrine-texto h2 { font-size: clamp(2.8rem, 7vw, 6rem); line-height: 1; margin-bottom: 2rem; }
+.vitrine-texto h2 em { font-style: italic; color: var(--ouro-claro); }
+.vitrine-texto::before { content: ""; position: absolute; inset: -30% -10%; z-index: -1; background: radial-gradient(closest-side, rgba(31,36,33,.85), rgba(31,36,33,0)); }
+@media (max-width: 860px) {
+  .vitrine { height: 150vh; }
+  .v1 { width: 52vw; left: -6vw; top: 8%; }
+  .v2 { width: 26vw; right: 4vw; top: 4%; }
+  .v3 { width: 34vw; left: 4vw; top: 66%; }
+  .v4 { width: 50vw; right: -8vw; top: 60%; }
+  .v5 { width: 22vw; left: 48vw; top: 96%; }
+  .v6 { width: 30vw; right: 60vw; top: 104%; }
+}
+
 /* Projetos */
 .filtros { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; }
 .filtro { background: transparent; border: 1px solid var(--linha); padding: .6em 1.15em; min-height: 40px; font-size: .88rem; color: var(--texto-suave); border-radius: 999px; transition: background-color .2s, border-color .2s, color .2s; }
