@@ -27,6 +27,7 @@ const heroConteudo = document.querySelector(".hero-conteudo");
 let agendado = false;
 const aoRolar = () => {
   agendado = false;
+  if (typeof moverFotoSobre === "function") moverFotoSobre();
   const y = window.scrollY;
   if (topo && !topo.classList.contains("sempre-solido")) topo.classList.toggle("solido", y > 40);
   if (heroBg && !reduzir && y < window.innerHeight * 1.2) {
@@ -34,6 +35,14 @@ const aoRolar = () => {
     heroConteudo.style.transform = "translate3d(0," + (y * 0.12).toFixed(1) + "px,0)";
     heroConteudo.style.opacity = Math.max(0, 1 - y / (window.innerHeight * 0.75)).toFixed(3);
   }
+};
+const fotoSobre = document.querySelector(".sobre-foto-moldura img");
+const moverFotoSobre = () => {
+  if (!fotoSobre || reduzir) return;
+  const r = fotoSobre.parentElement.getBoundingClientRect();
+  if (r.bottom < 0 || r.top > window.innerHeight) return;
+  const p = (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight; // -0,5 a 0,5 perto do centro
+  fotoSobre.style.transform = "translate3d(0," + (p * -12).toFixed(2) + "%,0)";
 };
 aoRolar();
 window.addEventListener("scroll", () => {
@@ -327,7 +336,7 @@ const ALVOS = [
   ".material", ".filtros", ".galeria figure", ".passo", ".kit-split-texto", ".orcamento > div", ".form",
   ".ficha > div", ".comparativo > div", ".faq-wrap > h2", ".faq details", ".rodape-grade > div",
 ];
-const FOTOS = [".sobre-fotos", ".destaque-kit-img", ".kit-card"];
+const FOTOS = [".sobre-foto-moldura", ".destaque-kit-img", ".kit-card"];
 const TITULOS = [".secao h2:not(.rodape-titulo)", ".destaque-kit-texto h2", ".produto-topo ~ section h2"];
 if (!reduzir && "IntersectionObserver" in window) {
   const observador = new IntersectionObserver(
@@ -374,8 +383,13 @@ if (acordeao) {
   const paineis = [...acordeao.querySelectorAll(".servico")];
   const abrir = (p) => paineis.forEach((x) => x.classList.toggle("aberto", x === p));
   const temMouse = window.matchMedia("(hover: hover)").matches;
+  let espera;
   paineis.forEach((p) => {
-    if (temMouse) p.addEventListener("mouseenter", () => abrir(p));
+    // Só abre se o mouse ficar um instante sobre o painel; passar por cima não dispara
+    if (temMouse) {
+      p.addEventListener("mouseenter", () => { clearTimeout(espera); espera = setTimeout(() => abrir(p), 180); });
+      p.addEventListener("mouseleave", () => clearTimeout(espera));
+    }
     p.addEventListener("focusin", () => abrir(p));
     p.addEventListener("click", (e) => {
       // No painel fechado, o primeiro toque só abre; o link vale quando já está aberto
@@ -387,8 +401,9 @@ if (acordeao) {
 // Vitrine: a foto central cresce até ocupar a tela e as outras se afastam
 const vitrine = document.querySelector(".vitrine");
 if (vitrine && !reduzir) {
-  const ESCALAS = [4, 5, 6, 5, 6, 8, 9];
   const itens = [...vitrine.querySelectorAll(".zoom-item")];
+  // A obra central cresce até cobrir a tela; as vizinhas crescem um pouco mais e saem pelas bordas
+  const ESCALAS = itens.map((it) => (it.classList.contains("centro") ? 4.2 : 4.8));
   const texto = vitrine.querySelector(".vitrine-texto");
   let ativa = false;
   let pedido = false;
