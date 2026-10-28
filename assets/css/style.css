@@ -66,6 +66,7 @@ button { font: inherit; cursor: pointer; }
 
 /* Tipografia */
 h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: 1.1; margin: 0 0 .5em; letter-spacing: .005em; text-wrap: balance; }
+h1, h2 { letter-spacing: -.01em; } /* títulos grandes ficam mais coesos com tracking levemente negativo */
 h1 { font-size: clamp(2.6rem, 6vw, 4.6rem); }
 h2 { font-size: clamp(2rem, 4vw, 3rem); }
 h3 { font-size: 1.55rem; line-height: 1.2; }
@@ -239,7 +240,7 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 .destaque-kit-texto { padding: clamp(50px, 7vw, 100px) clamp(24px, 6vw, 90px); display: flex; flex-direction: column; justify-content: center; }
 .preco-linha { display: flex; gap: 34px; margin: 1.2rem 0 2rem; flex-wrap: wrap; }
 .preco-linha div { font-size: .88rem; color: rgba(255,255,255,.65); }
-.preco-linha strong { display: block; font-family: var(--serif); font-weight: 500; font-size: 2.4rem; letter-spacing: 0; text-transform: none; line-height: 1.1; }
+.preco-linha strong { font-variant-numeric: tabular-nums; display: block; font-family: var(--serif); font-weight: 500; font-size: 2.4rem; letter-spacing: 0; text-transform: none; line-height: 1.1; }
 .selo-novo { display: inline-block; align-self: flex-start; background: var(--ouro-grad); color: var(--grafite); font-size: .8rem; font-weight: 700; padding: 4px 12px; margin-bottom: 1.2rem; border-radius: 2px; }
 @media (max-width: 860px) { .destaque-kit { grid-template-columns: 1fr; } .destaque-kit-img { aspect-ratio: 4/3; } }
 
@@ -327,7 +328,7 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 .rodape { background: var(--grafite); color: rgba(255,255,255,.6); font-size: .88rem; padding: 70px 0 30px; }
 .rodape-grade { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 50px; }
 .rodape img { height: 92px; width: auto; margin-bottom: 18px; }
-.rodape h4 { font-family: var(--serif); font-size: 1.25rem; color: var(--ouro-claro); margin: 0 0 14px; font-weight: 500; }
+.rodape-titulo { line-height: 1.2; font-family: var(--serif); font-size: 1.25rem; color: var(--ouro-claro); margin: 0 0 14px; font-weight: 500; }
 .rodape ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
 .rodape ul a { display: inline-block; padding: 4px 0; }
 .rodape a { transition: color .2s; }
