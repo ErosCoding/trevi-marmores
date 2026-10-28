@@ -30,18 +30,21 @@ if (topo && !topo.classList.contains("sempre-solido")) {
 const menuBtn = document.querySelector(".menu-btn");
 const nav = document.querySelector(".nav");
 if (menuBtn && nav) {
-  menuBtn.addEventListener("click", () => {
-    const aberto = nav.classList.toggle("aberto");
+  const definirMenu = (aberto) => {
+    nav.classList.toggle("aberto", aberto);
     menuBtn.setAttribute("aria-expanded", aberto);
+    menuBtn.setAttribute("aria-label", aberto ? "Fechar menu" : "Abrir menu");
     document.body.style.overflow = aberto ? "hidden" : "";
+    document.body.classList.toggle("menu-aberto", aberto);
+  };
+  menuBtn.addEventListener("click", () => definirMenu(!nav.classList.contains("aberto")));
+  nav.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => definirMenu(false)));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && nav.classList.contains("aberto")) {
+      definirMenu(false);
+      menuBtn.focus();
+    }
   });
-  nav.querySelectorAll("a").forEach((a) =>
-    a.addEventListener("click", () => {
-      nav.classList.remove("aberto");
-      menuBtn.setAttribute("aria-expanded", "false");
-      document.body.style.overflow = "";
-    })
-  );
 }
 
 // Galeria: filtros e lightbox
@@ -51,36 +54,77 @@ if (galeria) {
 
   document.querySelectorAll(".filtro").forEach((botao) => {
     botao.addEventListener("click", () => {
-      document.querySelectorAll(".filtro").forEach((b) => b.classList.remove("ativo"));
-      botao.classList.add("ativo");
+      document.querySelectorAll(".filtro").forEach((b) => {
+        b.classList.toggle("ativo", b === botao);
+        b.setAttribute("aria-pressed", b === botao);
+      });
       const cat = botao.dataset.filtro;
-      figuras.forEach((f) => f.classList.toggle("oculto", cat !== "todos" && f.dataset.cat !== cat));
+      figuras.forEach((f) => {
+        const ocultar = cat !== "todos" && f.dataset.cat !== cat;
+        f.classList.toggle("oculto", ocultar);
+        f.classList.remove("entrando");
+        if (!ocultar) {
+          void f.offsetWidth; // reinicia a animação
+          f.classList.add("entrando");
+        }
+      });
     });
   });
 
   const lb = document.querySelector(".lightbox");
   const lbImg = lb.querySelector("img");
+  const lbLegenda = lb.querySelector(".lb-legenda");
   let atual = 0;
+  let origem = null;
   const visiveis = () => figuras.filter((f) => !f.classList.contains("oculto"));
   const mostrar = (i) => {
     const lista = visiveis();
     atual = (i + lista.length) % lista.length;
-    const img = lista[atual].querySelector("img");
-    lbImg.src = img.src;
-    lbImg.alt = img.alt;
+    const fig = lista[atual];
+    const img = fig.querySelector("img");
+    const trocar = () => {
+      lbImg.src = img.currentSrc || img.src;
+      lbImg.alt = img.alt;
+      lbLegenda.textContent = fig.querySelector("figcaption")?.textContent || "";
+      const contador = document.createElement("span");
+      contador.textContent = atual + 1 + " de " + lista.length;
+      lbLegenda.append(contador);
+      lbImg.classList.remove("trocando");
+    };
+    if (lb.classList.contains("aberto")) {
+      lbImg.classList.add("trocando");
+      setTimeout(trocar, 180);
+    } else {
+      trocar();
+    }
+  };
+  const abrir = (f) => {
+    origem = f;
+    mostrar(visiveis().indexOf(f));
+    lb.classList.add("aberto");
+    lb.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    lb.querySelector(".lb-fechar").focus();
   };
   const fechar = () => {
     lb.classList.remove("aberto");
+    lb.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
+    if (origem) origem.focus();
   };
 
-  figuras.forEach((f) =>
-    f.addEventListener("click", () => {
-      mostrar(visiveis().indexOf(f));
-      lb.classList.add("aberto");
-      document.body.style.overflow = "hidden";
-    })
-  );
+  figuras.forEach((f) => {
+    f.tabIndex = 0;
+    f.setAttribute("role", "button");
+    f.setAttribute("aria-label", "Ampliar foto: " + (f.querySelector("figcaption")?.textContent || ""));
+    f.addEventListener("click", () => abrir(f));
+    f.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        abrir(f);
+      }
+    });
+  });
   lb.querySelector(".lb-fechar").addEventListener("click", fechar);
   lb.querySelector(".lb-ant").addEventListener("click", (e) => { e.stopPropagation(); mostrar(atual - 1); });
   lb.querySelector(".lb-prox").addEventListener("click", (e) => { e.stopPropagation(); mostrar(atual + 1); });
@@ -90,6 +134,13 @@ if (galeria) {
     if (e.key === "Escape") fechar();
     if (e.key === "ArrowLeft") mostrar(atual - 1);
     if (e.key === "ArrowRight") mostrar(atual + 1);
+    // Mantém o foco dentro da foto ampliada
+    if (e.key === "Tab") {
+      const botoes = [...lb.querySelectorAll("button")];
+      const i = botoes.indexOf(document.activeElement);
+      e.preventDefault();
+      botoes[(i + (e.shiftKey ? -1 : 1) + botoes.length) % botoes.length].focus();
+    }
   });
 }
 
@@ -132,8 +183,14 @@ if (kit) {
     return { opcao, material, n, total: PRECOS[opcao] * n };
   };
   const atualizar = () => {
-    const s = ler();
-    totais.forEach((t) => (t.textContent = real(s.total)));
+    const novo = real(ler().total);
+    totais.forEach((t) => {
+      if (t.textContent === novo) return;
+      t.textContent = novo;
+      t.classList.remove("mudou");
+      void t.offsetWidth; // reinicia o realce
+      t.classList.add("mudou");
+    });
   };
 
   kit.addEventListener("change", atualizar);
@@ -167,12 +224,20 @@ if (kit) {
 
   // Galeria do produto
   const principal = document.querySelector(".produto-principal img");
-  document.querySelectorAll(".miniaturas button").forEach((b) =>
+  const miniaturas = document.querySelectorAll(".miniaturas button");
+  miniaturas.forEach((b) =>
     b.addEventListener("click", () => {
-      document.querySelectorAll(".miniaturas button").forEach((x) => x.classList.remove("ativo"));
-      b.classList.add("ativo");
-      principal.src = b.dataset.src;
-      principal.alt = b.querySelector("img").alt;
+      if (b.classList.contains("ativo")) return;
+      miniaturas.forEach((x) => {
+        x.classList.toggle("ativo", x === b);
+        x.setAttribute("aria-pressed", x === b);
+      });
+      principal.classList.add("trocando");
+      setTimeout(() => {
+        principal.src = b.dataset.src;
+        principal.alt = b.querySelector("img").alt;
+        principal.classList.remove("trocando");
+      }, 180);
     })
   );
 
@@ -180,7 +245,12 @@ if (kit) {
   const barra = document.querySelector(".barra-compra");
   const botaoPrincipal = kit.querySelector("button[type=submit]");
   if (barra && botaoPrincipal) {
-    new IntersectionObserver(([e]) => barra.classList.toggle("visivel", !e.isIntersecting && e.boundingClientRect.top < 0)).observe(botaoPrincipal);
+    new IntersectionObserver(([e]) => {
+      const visivel = !e.isIntersecting && e.boundingClientRect.top < 0;
+      barra.classList.toggle("visivel", visivel);
+      barra.inert = !visivel;
+      document.body.classList.toggle("barra-ativa", visivel);
+    }).observe(botaoPrincipal);
   }
 }
 
