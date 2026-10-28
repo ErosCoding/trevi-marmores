@@ -85,13 +85,14 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
   padding: 1em 1.9em; border: 1px solid transparent; border-radius: var(--raio);
   font-size: .92rem; font-weight: 600; letter-spacing: .01em;
   min-height: 48px;
-  transition: background-color .25s, background-position .4s var(--suave), color .25s, border-color .25s, transform .15s;
+  transition: background-color .25s, background-position .4s var(--suave), color .25s, border-color .25s, transform .25s var(--suave), box-shadow .25s;
   white-space: nowrap;
 }
 .btn:active { transform: translateY(1px); }
 .btn svg { width: 18px; height: 18px; flex: none; }
 .btn-ouro { background: var(--ouro-grad); color: var(--grafite); background-size: 140% 100%; }
-.btn-ouro:hover { background-position: 100% 0; }
+.btn-ouro:hover { background-position: 100% 0; transform: translateY(-1px); box-shadow: 0 10px 24px -12px rgba(154,122,64,.7); }
+.btn-ouro:active { transform: translateY(0); box-shadow: none; }
 .btn-linha { border-color: currentColor; color: inherit; background: transparent; }
 .btn-linha:hover { background: var(--grafite); color: var(--branco); border-color: var(--grafite); }
 .on-dark .btn-linha:hover { background: var(--branco); color: var(--grafite); border-color: var(--branco); }
@@ -135,6 +136,14 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
     opacity: 0; visibility: hidden; transition: opacity .3s, visibility 0s .3s;
   }
   .nav.aberto { opacity: 1; visibility: visible; transition: opacity .3s; }
+  /* Links do menu entram em sequência */
+  .nav a { opacity: 0; transform: translateY(12px); transition: opacity .4s var(--suave), transform .5s var(--suave); }
+  .nav.aberto a { opacity: 1; transform: none; }
+  .nav.aberto a:nth-child(2) { transition-delay: .04s; }
+  .nav.aberto a:nth-child(3) { transition-delay: .08s; }
+  .nav.aberto a:nth-child(4) { transition-delay: .12s; }
+  .nav.aberto a:nth-child(5) { transition-delay: .16s; }
+  .nav.aberto a:nth-child(6) { transition-delay: .2s; }
   .nav a:not(.btn) { font-family: var(--serif); font-size: 2rem; font-weight: 500; color: #fff; padding: 4px 0; }
   .nav a:not(.btn)::after { display: none; }
   .nav .selo { font-family: var(--sans); vertical-align: 10px; }
@@ -276,7 +285,8 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
   opacity: 0; visibility: hidden; transition: opacity .3s, visibility 0s .3s;
 }
 .lightbox.aberto { opacity: 1; visibility: visible; transition: opacity .3s; }
-.lightbox img { min-height: 0; max-height: 100%; max-width: 100%; object-fit: contain; box-shadow: 0 30px 80px rgba(0,0,0,.5); transition: opacity .25s; }
+.lightbox img { min-height: 0; max-height: 100%; max-width: 100%; object-fit: contain; box-shadow: 0 30px 80px rgba(0,0,0,.5); transform: scale(.96); transition: opacity .25s, transform .45s var(--suave); }
+.lightbox.aberto img { transform: none; }
 .lightbox img.trocando { opacity: 0; }
 .lb-legenda { color: rgba(255,255,255,.85); font-family: var(--serif); font-size: 1.15rem; text-align: center; margin: 0; }
 .lb-legenda span { font-family: var(--sans); font-size: .8rem; color: rgba(255,255,255,.6); margin-left: 10px; font-variant-numeric: tabular-nums; }
@@ -347,6 +357,22 @@ p { margin: 0 0 1.1em; text-wrap: pretty; }
 .wa-flutuante:hover { transform: scale(1.06); }
 .menu-aberto .wa-flutuante { opacity: 0; visibility: hidden; }
 .wa-flutuante svg { width: 30px; height: 30px; }
+
+/* Transição suave entre as páginas (navegadores compatíveis) */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .35s; }
+
+/* Revelar ao rolar: só com JS ativo; sem JS tudo aparece normalmente */
+.js .revelar { opacity: 0; transform: translateY(22px); transition: opacity .9s var(--suave), transform .9s var(--suave); transition-delay: var(--atraso, 0s); }
+.js .revelar.visivel { opacity: 1; transform: none; }
+.js .revelar-foto { overflow: hidden; }
+.js .revelar-foto img { transform: scale(1.08); transition: transform 1.6s var(--suave); }
+.js .revelar-foto.visivel img { transform: none; }
+.js .produto-info > * { animation: surgir .8s var(--suave) both; }
+.js .produto-info > :nth-child(2) { animation-delay: .06s; }
+.js .produto-info > :nth-child(3) { animation-delay: .12s; }
+.js .produto-info > :nth-child(n+4) { animation-delay: .18s; }
+.js .produto-galeria { animation: aparecer .9s var(--suave) both; }
 
 /* Movimento reduzido */
 @media (prefers-reduced-motion: reduce) {

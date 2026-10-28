@@ -254,5 +254,43 @@ if (kit) {
   }
 }
 
+// Revelar ao rolar: blocos surgem com suavidade; os que entram juntos vêm em sequência
+const reduzir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const ALVOS = [
+  ".cabeca", ".sobre > div:last-child", ".valores li", ".servico", ".destaque-kit-texto",
+  ".material", ".filtros", ".galeria figure", ".passo", ".orcamento > div", ".form",
+  ".ficha > div", ".comparativo > div", ".faq-wrap > h2", ".faq details", ".rodape-grade > div",
+];
+const FOTOS = [".sobre-fotos", ".destaque-kit-img"];
+if (!reduzir && "IntersectionObserver" in window) {
+  const observador = new IntersectionObserver(
+    (entradas) =>
+      entradas
+        .filter((e) => e.isIntersecting)
+        .forEach((e, i) => {
+          e.target.style.setProperty("--atraso", Math.min(i, 5) * 0.08 + "s");
+          e.target.classList.add("visivel");
+          observador.unobserve(e.target);
+        }),
+    { rootMargin: "0px 0px -6% 0px", threshold: 0.05 }
+  );
+  document.querySelectorAll(ALVOS.join(",")).forEach((el) => {
+    el.classList.add("revelar");
+    observador.observe(el);
+  });
+  document.querySelectorAll(FOTOS.join(",")).forEach((el) => {
+    el.classList.add("revelar-foto");
+    observador.observe(el);
+  });
+  // Na impressão tudo precisa estar visível
+  window.addEventListener("beforeprint", () =>
+    document.querySelectorAll(".revelar, .revelar-foto").forEach((el) => el.classList.add("visivel"))
+  );
+  // Ao filtrar a galeria, as fotos já aparecem sem esperar a rolagem
+  document.querySelectorAll(".filtro").forEach((b) =>
+    b.addEventListener("click", () => document.querySelectorAll(".galeria figure").forEach((f) => f.classList.add("visivel")))
+  );
+}
+
 // Ano no rodapé
 document.querySelectorAll("[data-ano]").forEach((el) => (el.textContent = new Date().getFullYear()));
